@@ -2,22 +2,19 @@
 
 class WhmcsApi 
 {
-
 	public function init($action, $actionParams)
 	{
-
 		$params = array();
 		$params['username'] 	= \Config::get('whmcs-api::username');
 		$params['password'] 	= md5(\Config::get('whmcs-api::password'));
-		$params['url'] 			= \Config::get('whmcs-api::url');
-		$params['action']		= $action;
+		$params['url'] 		= \Config::get('whmcs-api::url');
+		$params['action']	= $action;
 
 		// merge $actionParams with $params
 		$params = array_merge($params, $actionParams);
 
 		// call curl init connection
 		return $this->curl($params);
-
 	}
 
 	public function curl($params)
@@ -32,10 +29,12 @@ class WhmcsApi
 		// if whmcs on dev licence and in Password Protect Directory
 		$pass = \Config::get('whmcs-api::dirpass');
 		$user = \Config::get('whmcs-api::diruser');
+		
 		if( !empty( $pass ) && !empty( $user ) )
 		{
 			curl_setopt($ch, CURLOPT_USERPWD, $user.":".$pass);
 		}
+		
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 100);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -53,13 +52,9 @@ class WhmcsApi
 		
 		if($xml) {
 			return $this->formatXml($data);
-		} 
-		elseif( isset( $params['responsetype'] ) && $params['responsetype'] == 'json' )
-		{
+		} elseif( isset( $params['responsetype'] ) && $params['responsetype'] == 'json' ) {
 			return $data;
-		}
-		else 
-		{
+		} else {
 			return $this->formatObject($data);
 		}
 
@@ -72,7 +67,6 @@ class WhmcsApi
 
 	public function formatObject($input)
 	{
-
 		$results = explode(';' ,$input);
 
 		$object = new \stdClass(); // standard object
@@ -91,7 +85,6 @@ class WhmcsApi
 
 	public function execute($action, $params)
 	{
-		
 		// Initiate
 		return $this->init($action, $params);
 
